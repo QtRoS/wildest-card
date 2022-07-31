@@ -31,7 +31,7 @@ void resetStates(char* pStates, int size)
     memset(pStates, 0, size);
 }
 
-bool check(STR_TYPE* pattern, STR_TYPE* input)
+bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
 {
     if (!pattern || !input)
         return false;
@@ -70,10 +70,7 @@ bool check(STR_TYPE* pattern, STR_TYPE* input)
             state = j;
             STR_TYPE c = pattern[state];
 
-            /* Нет смысла просматривать дальше. В этом случае состояние не
-                * попадает в pTmpBitArray и, следовательно, не будет учитываться
-                * на следующем шаге работы алгоритма.
-                */
+            // Should not be possible, but still worth checking.
             if (state >= patternLength)
                 continue;
 
@@ -83,26 +80,26 @@ bool check(STR_TYPE* pattern, STR_TYPE* input)
                 while (state < patternLength && pattern[state] == STAR_CHARACTER)
                     addState(pTempStates, ++state);
             }
-            else if (c == QUESTION_CHARACTER)
+            else if (c == QUESTION_CHARACTER || input[i] == c)
             {
                 addState(pTempStates, ++state);
                 while (state < patternLength && pattern[state] == STAR_CHARACTER)
                     addState(pTempStates, ++state);
             }
-            else if (input[i] == c) // TODO Схлопнуть с предыдущим
-            {
-                addState(pTempStates, ++state);
-                while (state < patternLength && pattern[state] == STAR_CHARACTER)
-                    addState(pTempStates, ++state);
-            }
-        } // for regex
+            // else if (input[i] == c) // TODO Схлопнуть с предыдущим
+            // {
+            //     addState(pTempStates, ++state);
+            //     while (state < patternLength && pattern[state] == STAR_CHARACTER)
+            //         addState(pTempStates, ++state);
+            // }
+        }
 
         pSwap = pCurrStates;
         pCurrStates = pTempStates;
         pTempStates = pSwap;
         
         resetStates(pTempStates, sizeInBytes);
-    } // for input
+    }
 
     bool result = checkBit(pCurrStates, patternLength);
     return result;
