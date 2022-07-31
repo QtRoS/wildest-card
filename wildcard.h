@@ -1,3 +1,9 @@
+// Wildest card is a tiny single-header wildcard matching library
+// Written by:   Roman Shchekin aka QtRoS
+// Licence:      MIT https://choosealicense.com/licenses/mit/
+// Project home: https://github.com/QtRoS/wildest-card
+// Version:      v1.0
+
 #include <memory.h>
 #include <stdbool.h>
 
@@ -46,9 +52,8 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
     resetStates(pCurrStates, sizeInBytes);
     resetStates(pNextStates, sizeInBytes);
 
-    // NFA starts in zero state.
-    // Here and further: while corresponding pattern symbol is *,
-    // we do epsilon-transition to the next state. 
+    // NFA starts in zero state. Here and further: while corresponding pattern symbol
+    // is equal STAR_CHARACTER, we do epsilon-transition to the next state. 
     addState(pCurrStates, state);
     while (state < patternLength && pattern[state] == STAR_CHARACTER)
         addState(pCurrStates, ++state);
