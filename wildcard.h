@@ -9,20 +9,15 @@
 #define STAR_CHARACTER '*'
 #define QUESTION_CHARACTER '?'
 
+
 #define addState(_bitArray, _pos) \
-    do { \
+    { \
         char *bitArray = _bitArray; \
         int pos = _pos; \
         (bitArray)[(pos) / SIZE_OF_CHAR] = (bitArray)[(pos) / SIZE_OF_CHAR] | ( 1 << ((pos) % SIZE_OF_CHAR )); \
-    } while (0)
+    }
 
 #define checkState(bitArray,pos) (bitArray[pos / SIZE_OF_CHAR] & ( 1 << (pos % SIZE_OF_CHAR )))
-
-int calculateRequiredMemory(int stateCount)
-{
-    int byteLen = (stateCount >> 3) + (stateCount & 0x7 ? 1 : 0);
-    return byteLen;
-}
 
 void resetStates(char* pStates, int size)
 {
@@ -35,10 +30,10 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
         return false;
     
     char nfaCurrStates[MAX_WILDCARD_LEN / SIZE_OF_CHAR];
-    char nfaTempStates[MAX_WILDCARD_LEN / SIZE_OF_CHAR];
+    char nfaNextStates[MAX_WILDCARD_LEN / SIZE_OF_CHAR];
 
     char* pCurrStates = nfaCurrStates;
-    char* pTempStates = nfaTempStates;
+    char* pNextStates = nfaNextStates;
     char* pSwap;
 
     int i, j;
@@ -47,9 +42,9 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
     int nfaStateCount = patternLength + 1; // Extra 1 for accepting state of NFA.
     int state = 0;
 
-    int sizeInBytes = calculateRequiredMemory(nfaStateCount);
+    int sizeInBytes = (nfaStateCount >> 3) + (nfaStateCount & 0x7 ? 1 : 0);
     resetStates(pCurrStates, sizeInBytes);
-    resetStates(pTempStates, sizeInBytes);
+    resetStates(pNextStates, sizeInBytes);
 
     // NFA starts in zero state.
     // Here and further: while corresponding pattern symbol is *,
@@ -74,26 +69,26 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
 
             if (c == STAR_CHARACTER)
             {
-                addState(pTempStates, state);
+                addState(pNextStates, state);
                 while (state < patternLength && pattern[state] == STAR_CHARACTER)
-                    addState(pTempStates, ++state);
+                    addState(pNextStates, ++state);
             }
             else if (c == QUESTION_CHARACTER || input[i] == c)
             {
-                addState(pTempStates, ++state);
+                addState(pNextStates, ++state);
                 while (state < patternLength && pattern[state] == STAR_CHARACTER)
-                    addState(pTempStates, ++state);
+                    addState(pNextStates, ++state);
             }
         }
 
         pSwap = pCurrStates;
-        pCurrStates = pTempStates;
-        pTempStates = pSwap;
+        pCurrStates = pNextStates;
+        pNextStates = pSwap;
         
-        resetStates(pTempStates, sizeInBytes);
+        resetStates(pNextStates, sizeInBytes);
     }
 
-    bool result = checkState(pCurrStates, patternLength);
+    bool result = checkState(pCurrStates, patternLength); // Check if NFA is in accepting state.
     return result;
 }
 /* ----- WILDCARD ----- */

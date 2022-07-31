@@ -29,9 +29,10 @@ int main()
     // bool res = check("*.png", "file.png1");
     // printf("result is: %d\n", res);
     int i;
+    int totalTestCount = sizeof(testCases) / sizeof(testCases[0]);
     int failedTestCount = 0;
 
-    for (i = 0; i < sizeof(testCases) / sizeof(testCases[0]);++i)
+    for (i = 0; i < totalTestCount;++i)
     {
         bool actualAnswer = wildcard(testCases[i].pattern, testCases[i].input);
 
@@ -42,11 +43,11 @@ int main()
 
         if (actualAnswer != testCases[i].expectedAnswer)
         {
-            printf("THIS WAS NOT EXPECTED!\n");
+            printf(" ===> THIS WAS NOT EXPECTED!\n");
             ++failedTestCount;
         }
     }
 
-    printf("\n\nTotal amount of failed tests: %d\n", failedTestCount);
+    printf("\n\nTotal amount of failed tests: %d/%d\n", failedTestCount, totalTestCount);
     printf("%s\n", failedTestCount ? "FAILURE" : "SUCCESS");
 }
