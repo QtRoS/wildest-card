@@ -19,6 +19,8 @@ TestCase testCases[] = {
     {"abc?", "abcd", true},
     {"abc*", "abcd", true},
     {"abc*?", "abcd", true},
+    {"abc*?d", "abcd", false},
+    {"ab*?d", "abcd", true},
     {"*", "picture.png", true},
 };
 
@@ -33,13 +35,14 @@ int main()
     {
         bool actualAnswer = wildcard(testCases[i].pattern, testCases[i].input);
 
+        printf("TEST     #%d\n", i);
         printf("PATTERN: %s\n", testCases[i].pattern);
         printf("INPUT:   %s\n", testCases[i].input);
-        printf("RESULT:  %s\n", actualAnswer ? "TRUE" : "FALSE");
+        printf("ANSWER:  %s\n", actualAnswer ? "MATCH" : "MISMATCH");
 
         if (actualAnswer != testCases[i].expectedAnswer)
         {
-            printf("THIS WAS NOT EXPECTED!");
+            printf("THIS WAS NOT EXPECTED!\n");
             ++failedTestCount;
         }
     }

@@ -1,5 +1,3 @@
-/* ----- WILDCARD ----- */
-
 #include <memory.h>
 #include <stdbool.h>
 
@@ -18,7 +16,7 @@
         (bitArray)[(pos) / SIZE_OF_CHAR] = (bitArray)[(pos) / SIZE_OF_CHAR] | ( 1 << ((pos) % SIZE_OF_CHAR )); \
     } while (0)
 
-#define checkBit(bitArray,pos) (bitArray[pos / SIZE_OF_CHAR] & ( 1 << (pos % SIZE_OF_CHAR )))
+#define checkState(bitArray,pos) (bitArray[pos / SIZE_OF_CHAR] & ( 1 << (pos % SIZE_OF_CHAR )))
 
 int calculateRequiredMemory(int stateCount)
 {
@@ -64,10 +62,10 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
     {
         for (j = 0; j < SIZE_OF_CHAR * sizeInBytes; j++)
         {
-            if (!checkBit(pCurrStates, j))
-                continue;
-
             state = j;
+            if (!checkState(pCurrStates, state))
+                continue;
+            
             STR_TYPE c = pattern[state];
 
             // Should not be possible, but still worth checking.
@@ -86,12 +84,6 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
                 while (state < patternLength && pattern[state] == STAR_CHARACTER)
                     addState(pTempStates, ++state);
             }
-            // else if (input[i] == c) // TODO Схлопнуть с предыдущим
-            // {
-            //     addState(pTempStates, ++state);
-            //     while (state < patternLength && pattern[state] == STAR_CHARACTER)
-            //         addState(pTempStates, ++state);
-            // }
         }
 
         pSwap = pCurrStates;
@@ -101,7 +93,7 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
         resetStates(pTempStates, sizeInBytes);
     }
 
-    bool result = checkBit(pCurrStates, patternLength);
+    bool result = checkState(pCurrStates, patternLength);
     return result;
 }
 /* ----- WILDCARD ----- */
