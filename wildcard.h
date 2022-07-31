@@ -1,36 +1,36 @@
 #include <memory.h>
 #include <stdbool.h>
 
-#define SIZE_OF_CHAR 8
-#define MAX_WILDCARD_LEN 256
-
+// High level defines, can be castomized to wchar_t and wcslen for example.
 #define STR_TYPE char
 #define STR_LEN strlen
 #define STAR_CHARACTER '*'
 #define QUESTION_CHARACTER '?'
 
+// Low level defines, used in compact NFA implementation.
+#define BITS_IN_CHAR (sizeof(char) * 8)
+#define MAX_WILDCARD_LEN 256
 
+// Very fast and compact bitwise NFA implementation.
 #define addState(_bitArray, _pos) \
     { \
         char *bitArray = _bitArray; \
         int pos = _pos; \
-        (bitArray)[(pos) / SIZE_OF_CHAR] = (bitArray)[(pos) / SIZE_OF_CHAR] | ( 1 << ((pos) % SIZE_OF_CHAR )); \
+        (bitArray)[(pos) / BITS_IN_CHAR] = (bitArray)[(pos) / BITS_IN_CHAR] | ( 1 << ((pos) % BITS_IN_CHAR )); \
     }
 
-#define checkState(bitArray,pos) (bitArray[pos / SIZE_OF_CHAR] & ( 1 << (pos % SIZE_OF_CHAR )))
+#define checkState(bitArray,pos) (bitArray[pos / BITS_IN_CHAR] & ( 1 << (pos % BITS_IN_CHAR )))
 
-void resetStates(char* pStates, int size)
-{
-    memset(pStates, 0, size);
-}
+#define resetStates(_pStates, _size) memset(_pStates, 0, _size)
 
+// Wildcard implementation itself.
 bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
 {
     if (!pattern || !input)
         return false;
     
-    char nfaCurrStates[MAX_WILDCARD_LEN / SIZE_OF_CHAR];
-    char nfaNextStates[MAX_WILDCARD_LEN / SIZE_OF_CHAR];
+    char nfaCurrStates[MAX_WILDCARD_LEN / BITS_IN_CHAR];
+    char nfaNextStates[MAX_WILDCARD_LEN / BITS_IN_CHAR];
 
     char* pCurrStates = nfaCurrStates;
     char* pNextStates = nfaNextStates;
@@ -55,7 +55,7 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
 
     for (i = 0; i < inputLength; i++)
     {
-        for (j = 0; j < SIZE_OF_CHAR * sizeInBytes; j++)
+        for (j = 0; j < BITS_IN_CHAR * sizeInBytes; j++)
         {
             state = j;
             if (!checkState(pCurrStates, state))
@@ -91,4 +91,3 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
     bool result = checkState(pCurrStates, patternLength); // Check if NFA is in accepting state.
     return result;
 }
-/* ----- WILDCARD ----- */
