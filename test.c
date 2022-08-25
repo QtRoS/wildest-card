@@ -22,7 +22,12 @@ TestCase testCases[] = {
     {"abc*?d", "abcd", false},
     {"ab*?d", "abcd", true},
     {"*", "picture.png", true},
+
+    {"a*b", "abc", false},
+    {"a?", "a", false},
+    {"a*b", "ab", true},
 };
+
 
 int main()
 {
