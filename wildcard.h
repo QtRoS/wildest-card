@@ -2,7 +2,7 @@
 // Written by:   Roman Shchekin aka QtRoS
 // Licence:      MIT https://choosealicense.com/licenses/mit/
 // Project home: https://github.com/QtRoS/wildest-card
-// Version:      v1.0
+// Version:      v1.1
 
 #include <memory.h>
 #include <stdbool.h>
@@ -15,7 +15,8 @@
 
 // Low level defines, used in compact NFA implementation.
 #define BITS_IN_CHAR (sizeof(char) * 8)
-#define MAX_WILDCARD_LEN 256
+#define BIT_IN_CHAR_LOG2 3
+#define MAX_WILDCARD_LEN 255
 
 // Very fast and compact bitwise NFA implementation.
 #define addState(_bitArray, _pos) \
@@ -34,21 +35,23 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
 {
     if (!pattern || !input)
         return false;
+
+    int i, j;
+    int inputLength = STR_LEN(input);
+    int patternLength = STR_LEN(pattern);
+    patternLength = patternLength > MAX_WILDCARD_LEN ? MAX_WILDCARD_LEN : patternLength;
     
-    char nfaCurrStates[MAX_WILDCARD_LEN / BITS_IN_CHAR];
-    char nfaNextStates[MAX_WILDCARD_LEN / BITS_IN_CHAR];
+    int state = 0;
+    int nfaStateCount = patternLength + 1; // Extra 1 for accepting state of NFA.
+    int sizeInBytes = (nfaStateCount >> BIT_IN_CHAR_LOG2) + (nfaStateCount & 0x7 ? 1 : 0);
+
+    char nfaCurrStates[sizeInBytes];
+    char nfaNextStates[sizeInBytes];
 
     char* pCurrStates = nfaCurrStates;
     char* pNextStates = nfaNextStates;
     char* pSwap;
 
-    int i, j;
-    int patternLength = STR_LEN(pattern);
-    int inputLength = STR_LEN(input);
-    int nfaStateCount = patternLength + 1; // Extra 1 for accepting state of NFA.
-    int state = 0;
-
-    int sizeInBytes = (nfaStateCount >> 3) + (nfaStateCount & 0x7 ? 1 : 0);
     resetStates(pCurrStates, sizeInBytes);
     resetStates(pNextStates, sizeInBytes);
 
