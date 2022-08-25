@@ -63,7 +63,7 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
 
     for (i = 0; i < inputLength; i++)
     {
-        for (j = 0; j < BITS_IN_CHAR * sizeInBytes; j++)
+        for (j = 0; j < nfaStateCount; j++)
         {
             state = j;
             if (!checkState(pCurrStates, state))
