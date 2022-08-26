@@ -2,7 +2,7 @@
 // Written by:   Roman Shchekin aka QtRoS
 // Licence:      MIT https://choosealicense.com/licenses/mit/
 // Project home: https://github.com/QtRoS/wildest-card
-// Version:      v1.1
+// Version:      v1.2
 
 #include <memory.h>
 #include <stdbool.h>
@@ -16,7 +16,7 @@
 // Low level defines, used in compact NFA implementation.
 #define BITS_IN_CHAR (sizeof(char) * 8)
 #define BIT_IN_CHAR_LOG2 3
-#define MAX_WILDCARD_LEN 255
+#define MAX_WILDCARD_LEN 255  // Only 2^n-1 values are acceptable, e.g. 7, 31, 1023 
 
 // Very fast and compact bitwise NFA implementation.
 #define addState(_bitArray, _pos) \
@@ -45,15 +45,13 @@ bool wildcard(STR_TYPE const * pattern, STR_TYPE const* input)
     int nfaStateCount = patternLength + 1; // Extra 1 for accepting state of NFA.
     const int sizeInBytes = (nfaStateCount >> BIT_IN_CHAR_LOG2) + (nfaStateCount & 0x7 ? 1 : 0);
 
-    char nfaCurrStates[(MAX_WILDCARD_LEN + 1) / BITS_IN_CHAR];
-    char nfaNextStates[(MAX_WILDCARD_LEN + 1) / BITS_IN_CHAR];
+    // Only sizeInBytes bytes will be used for NFA.
+    char nfaCurrStates[(MAX_WILDCARD_LEN + 1) / BITS_IN_CHAR] = {0};
+    char nfaNextStates[(MAX_WILDCARD_LEN + 1) / BITS_IN_CHAR] = {0};
 
     char* pCurrStates = nfaCurrStates;
     char* pNextStates = nfaNextStates;
     char* pSwap;
-
-    resetStates(pCurrStates, sizeInBytes);
-    resetStates(pNextStates, sizeInBytes);
 
     // NFA starts in zero state. Here and further: while corresponding pattern symbol
     // is equal STAR_CHARACTER, we do epsilon-transition to the next state. 
@@ -63,17 +61,13 @@ bool wildcard(STR_TYPE const * pattern, STR_TYPE const* input)
 
     for (i = 0; i < inputLength; i++)
     {
-        for (j = 0; j < nfaStateCount; j++)
+        for (j = 0; j < patternLength; j++)
         {
             state = j;
             if (!checkState(pCurrStates, state))
                 continue;
 
             STR_TYPE c = pattern[state];
-
-            // Should not be possible, but still worth checking.
-            if (state >= patternLength)
-                continue;
 
             if (c == STAR_CHARACTER)
             {
