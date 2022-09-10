@@ -31,7 +31,7 @@
 #define resetStates(_pStates, _size) memset(_pStates, 0, _size)
 
 // Wildcard implementation itself.
-bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
+bool wildcard(STR_TYPE const * pattern, STR_TYPE const* input)
 {
     if (!pattern || !input)
         return false;
@@ -40,13 +40,13 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
     int inputLength = STR_LEN(input);
     int patternLength = STR_LEN(pattern);
     patternLength = patternLength > MAX_WILDCARD_LEN ? MAX_WILDCARD_LEN : patternLength;
-    
+
     int state = 0;
     int nfaStateCount = patternLength + 1; // Extra 1 for accepting state of NFA.
-    int sizeInBytes = (nfaStateCount >> BIT_IN_CHAR_LOG2) + (nfaStateCount & 0x7 ? 1 : 0);
+    const int sizeInBytes = (nfaStateCount >> BIT_IN_CHAR_LOG2) + (nfaStateCount & 0x7 ? 1 : 0);
 
-    char nfaCurrStates[sizeInBytes];
-    char nfaNextStates[sizeInBytes];
+    char nfaCurrStates[(MAX_WILDCARD_LEN + 1) / BITS_IN_CHAR];
+    char nfaNextStates[(MAX_WILDCARD_LEN + 1) / BITS_IN_CHAR];
 
     char* pCurrStates = nfaCurrStates;
     char* pNextStates = nfaNextStates;
@@ -68,7 +68,7 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
             state = j;
             if (!checkState(pCurrStates, state))
                 continue;
-            
+
             STR_TYPE c = pattern[state];
 
             // Should not be possible, but still worth checking.
@@ -92,7 +92,7 @@ bool wildcard(STR_TYPE* pattern, STR_TYPE* input)
         pSwap = pCurrStates;
         pCurrStates = pNextStates;
         pNextStates = pSwap;
-        
+
         resetStates(pNextStates, sizeInBytes);
     }
 
