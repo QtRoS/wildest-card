@@ -51,6 +51,5 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Tests
-test
-example
+# build folder
+build

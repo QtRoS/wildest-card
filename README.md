@@ -1,7 +1,13 @@
-# Wildest card
+# :asterisk: Wildest card
 Tiny wildcard library written in single h-file without any dependencies
 
-### Features
+## Summary
+- [Features](#features)
+- [Example](#example)
+- [Installation](#installation)
+- [Running tests](#installation)
+
+## Features
 
 - Based on NFA 
 - Written in C in single header file
@@ -13,7 +19,7 @@ Tiny wildcard library written in single h-file without any dependencies
 
 Where M is the length of the expression/pattern, N is the length of the string
 
-### Example
+## Example
 
 ```c
 #include "wildcard.h"
@@ -21,12 +27,30 @@ Where M is the length of the expression/pattern, N is the length of the string
 bool answer = wildcard("*.cpp", "file.cpp");
 ```
 
-### Installation
+## Installation
 
-Just download `wildcard.h` and include to your project.
-
-### Running tests
+- Getting the library from source:
 
 ```bash
-$ gcc -std=c11 -pedantic test.c -o test && chmod u+x test && ./test 
+git clone https://github.com/joaovictorjs/scheduler
+```
+
+- Setup and compile (meson required):
+
+```bash
+cd wildest-card &&
+meson setup --prefix=/usr --buildtype=release build &&
+meson compile -C build
+```
+
+- Finally, install the library:
+
+``` bash
+meson install -C build
+```
+
+## Running tests
+
+``` bash
+meson test -C build
 ```
