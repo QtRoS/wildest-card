@@ -32,7 +32,7 @@ bool answer = wildcard("*.cpp", "file.cpp");
 - Getting the library from source:
 
 ```bash
-git clone https://github.com/joaovictorjs/scheduler
+git clone https://github.com/joaovictorjs/wildest-card
 ```
 
 - Setup and compile (meson required):
