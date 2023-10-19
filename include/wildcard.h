@@ -2,7 +2,10 @@
 // Written by:   Roman Shchekin aka QtRoS
 // Licence:      MIT https://choosealicense.com/licenses/mit/
 // Project home: https://github.com/QtRoS/wildest-card
-// Version:      v1.2
+// Version:      v1.2.1
+
+#ifndef WILDCARD_H
+#define WILDCARD_H
 
 #include <memory.h>
 #include <stdbool.h>
@@ -31,7 +34,7 @@
 #define resetStates(_pStates, _size) memset(_pStates, 0, _size)
 
 // Wildcard implementation itself.
-bool wildcard(STR_TYPE const * pattern, STR_TYPE const* input)
+inline bool wildcard(STR_TYPE const * pattern, STR_TYPE const* input)
 {
     if (!pattern || !input)
         return false;
@@ -93,3 +96,4 @@ bool wildcard(STR_TYPE const * pattern, STR_TYPE const* input)
     bool result = checkState(pCurrStates, patternLength); // Check if NFA is in accepting state.
     return result;
 }
+#endif
