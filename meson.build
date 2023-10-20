@@ -1,4 +1,4 @@
-project('wildest-card', 'c', version: '0.0.1')
+project('wildest-card', 'c', version: '1.2.1')
 
 include = include_directories('include')
 
